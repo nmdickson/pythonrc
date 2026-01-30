@@ -218,3 +218,11 @@ def ll():
         sys.stdout.write(f"{tp:>{max_n}} "
                          f"{size_nm} "
                          f"{clr_nm}\n")
+
+
+def wait_what():
+    import pdb
+    try:
+        return pdb.pm()
+    except AttributeError:
+        return "Nothing errored, keep moving."
