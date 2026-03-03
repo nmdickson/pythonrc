@@ -171,11 +171,12 @@ def ls():
         sys.stdout.write('\n')
 
 
-def ll():
-    import __main__
+def _ls_l(main=None):
+    if main is None:
+        import __main__ as main
 
-    names = sorted(__main__.__dict__)
-    items = [__main__.__dict__[nm] for nm in names]
+    names = sorted(main.__dict__)
+    items = [main.__dict__[nm] for nm in names]
     types = [type(obj).__name__ for obj in items]
 
     for ind, obj in enumerate(items):
@@ -188,6 +189,8 @@ def ll():
                 except TypeError:
                     shp = ''
 
+            # TODO need to match ls logic above to make this work
+            # types[ind] += in_colour(shp, 'white_bf')
             types[ind] += shp
 
     max_n = len(max(types, key=lambda t: len(t)))
@@ -220,9 +223,58 @@ def ll():
                          f"{clr_nm}\n")
 
 
+def ll():
+    return _ls_l(None)
+
+
+def obj_ll(namespace):
+    return _ls_l(namespace)
+
+
 def wait_what():
     import pdb
     try:
         return pdb.pm()
     except AttributeError:
         return "Nothing errored, keep moving."
+
+
+def reverse_search(term, *, highlight=True, line_nos=False, return_=False):
+    '''reverse search through python history to find given term'''
+
+    # Check for env variable (py>3.13)
+    fn = os.environ.get('PYTHON_HISTORY',
+                        pathlib.Path.home() / '.python_history')
+
+    result = []
+
+    with open(fn, 'r') as hist_file:
+
+        for lnum, line in enumerate(hist_file):
+
+            # TODO support regex
+            if term in line:
+
+                outstr = ''
+
+                if line_nos:
+                    outstr += in_colour(f'{lnum:>6} | ', 'blue_bf')
+
+                if highlight:
+
+                    loc = line.index(term)
+
+                    pre, post = line[:loc], line[loc + len(term):]
+
+                    outstr += f"{pre}{in_colour(term, 'green_bf')}{post}"
+
+                else:
+                    outstr += line
+
+                result.append(outstr)
+
+    if return_:
+        return result
+    else:
+        for res in result:
+            sys.stdout.write(res)
