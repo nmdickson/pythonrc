@@ -9,7 +9,7 @@ except ImportError:
     import sys, inspect, pathlib
 
     sys.path.append(
-        pathlib.Path(inspect.getfile(inspect.currentframe())).parent
+        str(pathlib.Path(inspect.getfile(inspect.currentframe())).parent)
     )
 
     from pythonrc import *
