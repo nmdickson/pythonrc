@@ -18,10 +18,15 @@ from .numbers import *
 # --------------------------------------------------------------------------
 
 
-import os, sys, glob, pathlib, logging, warnings, pprint
+import os, sys, glob, pathlib, logging, warnings, pprint, inspect
 from importlib import reload
 
 warnings.simplefilter('always')  # don't go silently into that sweet bug
+
+
+# For _here's eyes only
+_here = pathlib.Path(inspect.getfile(inspect.currentframe())).parent
+
 
 try:
     logging.getLogger().setLevel('DEBUG')
@@ -34,14 +39,40 @@ except ImportError as err:
     raise err
 
 try:
+    import scipy
+except ImportError as err:
+    raise err
+
+try:
     import matplotlib.pyplot as plt
     logging.getLogger('matplotlib').setLevel(logging.WARNING)
     logging.getLogger('PIL').setLevel(logging.WARNING)
+
+    plt.style.use(_here / 'mpl_dev_style.mplstyle')
 except ImportError as err:
     raise err
 
 try:
     import astropy.units as u
+except ImportError as err:
+    raise err
+
+
+# def check_version():
+
+    # make a request to https://pypi.org/pypi/astro-ssptools/json
+    # use packaging.version.parse to compare current and new versions
+    # raise warning if needs updating
+
+
+# --------------------------------------------------------------------------
+# Fancier traceback printing
+# --------------------------------------------------------------------------
+
+try:
+    import rich.traceback
+    rich.traceback.install()
+
 except ImportError as err:
     raise err
 
